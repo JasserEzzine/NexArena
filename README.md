@@ -149,6 +149,7 @@ There are no user-controlled shell strings, launch arguments, or remote executab
 | `DEMO_PASSWORD` | At least 10 characters; consumed only during initial seed |
 | `CORS_ORIGINS` | Comma-separated allowed dashboard origins |
 | `HEARTBEAT_TIMEOUT` | Offline threshold, seconds; default 30 |
+| `DB_PORT`, `API_PORT`, `FRONTEND_PORT` | Optional Compose host ports; defaults 5432, 8000, 8080 |
 
 ## Tests
 

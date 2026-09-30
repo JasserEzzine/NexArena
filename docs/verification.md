@@ -43,6 +43,6 @@ A shutdown request delivered to the real agent was correctly rejected because `E
 - Peripheral removal alerts were verified with protocol fixtures; physically unplugging devices and virtual-device edge cases need testing on the target PCs.
 - Sensor availability varies with hardware, drivers, and permissions.
 - CI configuration is included but has not run on GitHub until the repository is pushed and Actions executes it.
-- Public repository publication depends on the user's remote URL and available Git authentication. A demo video script is included; no video was recorded.
+- The source was pushed to the public [JasserEzzine/NexArena](https://github.com/JasserEzzine/NexArena) repository on 2026-09-30. A demo video script is included; no video was recorded.
 
 These boundaries are intentionally separate from implemented features; they should not be described as completed physical or deployment acceptance tests.
