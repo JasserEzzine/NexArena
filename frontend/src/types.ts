@@ -29,6 +29,7 @@ export type Node = {
   telemetry: Telemetry;
 };
 export type Session = {
+  is_demo: boolean;
   id: string;
   node_id: string;
   user_id: string;
@@ -54,6 +55,7 @@ export type Membership = {
   status: string;
 };
 export type Reservation = {
+  is_demo: boolean;
   id: string;
   user_id: string;
   node_id: string;
@@ -63,6 +65,7 @@ export type Reservation = {
   status: string;
 };
 export type Game = {
+  image_url: string;
   id: string;
   name: string;
   description: string;
@@ -106,4 +109,65 @@ export type Data = {
   games: Game[];
   alerts: Alert[];
   commands: Command[];
+};
+
+export type Team = {
+  id: string;
+  name: string;
+  tag: string;
+  city: string;
+  color: string;
+  description: string;
+  website: string;
+  is_demo: boolean;
+  member_count: number;
+};
+export type Player = {
+  user_id: string;
+  name: string;
+  handle: string;
+  city: string;
+  team_id: string | null;
+  team_tag: string | null;
+  is_demo: boolean;
+  active: boolean;
+};
+export type RankEntry = {
+  user_id: string;
+  game_id: string;
+  handle: string;
+  name: string;
+  city: string;
+  team_id: string | null;
+  team_tag: string | null;
+  team_color: string;
+  rating: number;
+  peak_rating: number;
+  wins: number;
+  losses: number;
+  streak: number;
+  position: number;
+  tier: string;
+  win_rate: number;
+  is_demo: boolean;
+};
+export type Leaderboard = {
+  game_id: string;
+  game_name: string;
+  system: string;
+  starting_rating: number;
+  k_factor: number;
+  entries: RankEntry[];
+};
+export type RankedResult = {
+  id: string;
+  winner_id: string;
+  loser_id: string;
+  winner_handle: string;
+  loser_handle: string;
+  rating_delta: number;
+  winner_rating: number;
+  loser_rating: number;
+  created_at: string;
+  is_demo: boolean;
 };

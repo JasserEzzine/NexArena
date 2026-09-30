@@ -43,3 +43,5 @@ def seed():
 
 if __name__ == "__main__":
     seed()
+    from .seed_tunisia import seed_tunisia
+    seed_tunisia()

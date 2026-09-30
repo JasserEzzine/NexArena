@@ -49,8 +49,12 @@ import {
   Keyboard,
   Mouse,
   RefreshCw,
+  Trophy,
+  Shield,
 } from "lucide-react";
 import { api } from "./api";
+import Esports, { CommunityPreview } from "./Esports";
+import GameArtwork from "./GameArtwork";
 import type {
   Alert,
   Branch,
@@ -86,6 +90,8 @@ const navigation = [
   ["/wallets", "Wallets", Wallet],
   ["/memberships", "Memberships", Crown],
   ["/games", "Game library", Gamepad2],
+  ["/rankings", "Player rankings", Trophy],
+  ["/teams", "Tunisian teams", Shield],
   ["/alerts", "Alerts", Bell],
   ["/users", "People", Users],
   ["/branches", "Branches", MapPin],
@@ -533,7 +539,13 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
       ws.onopen = () => {
         ws.send(JSON.stringify({ token: sessionStorage.getItem("token") }));
       };
-      ws.onmessage = () => {
+      ws.onmessage = (message) => {
+        try {
+          if (JSON.parse(message.data).event === "esports")
+            window.dispatchEvent(new Event("arena-esports"));
+        } catch {
+          /* Ignore malformed refresh events. */
+        }
         setLive(true);
         delay = 1000;
         clearTimeout(refresh);
@@ -756,6 +768,12 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         { key: "genre", label: "Genre", value: g?.genre },
         { key: "version", label: "Version", value: g?.version },
         {
+          key: "image_url",
+          label: "Cover image URL · HTTPS or /images/ path",
+          value: g?.image_url,
+          required: false,
+        },
+        {
           key: "executable_path",
           label: "Windows executable path",
           value: g?.executable_path,
@@ -922,6 +940,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
               <td>
                 <b>{nname(s.node_id)}</b>
                 <small>{uname(s.user_id)}</small>
+                {s.is_demo && <span className="demo-chip">Demo session</span>}
               </td>
               <td>{stamp(s.start_time)}</td>
               <td className="mono">{duration(s, time)}</td>
@@ -977,6 +996,9 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             <tr key={r.id}>
               <td>
                 <b>{uname(r.user_id)}</b>
+                {r.is_demo && (
+                  <small className="demo-label">Demo booking</small>
+                )}
               </td>
               <td>{nname(r.node_id)}</td>
               <td>
@@ -1034,7 +1056,8 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
               to={path}
               end={path === "/"}
               className={({ isActive }) =>
-                (isActive ? "active " : "") + (i === 8 ? "nav-divider" : "")
+                (isActive ? "active " : "") +
+                (path === "/users" ? "nav-divider" : "")
               }
             >
               <Icon size={18} />
@@ -1150,6 +1173,10 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                         "/memberships":
                           "Give your community a reason to keep coming back.",
                         "/games": "One library. Every station. Ready to play.",
+                        "/rankings":
+                          "The Tunisian arena ladder. Every game has its champions.",
+                        "/teams":
+                          "Meet the players and teams behind the Tunisian scene.",
                         "/alerts": "Keep an eye on what needs your attention.",
                         "/users": "The people who make your arena.",
                         "/branches": "One workspace for all your locations.",
@@ -1232,6 +1259,28 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           ) : (
             <Routes>
               <Route
+                path="/teams"
+                element={
+                  <Esports
+                    mode="teams"
+                    games={data.games}
+                    users={data.users}
+                    admin={admin}
+                  />
+                }
+              />
+              <Route
+                path="/rankings"
+                element={
+                  <Esports
+                    mode="rankings"
+                    games={data.games}
+                    users={data.users}
+                    admin={admin}
+                  />
+                }
+              />
+              <Route
                 path="/"
                 element={
                   <>
@@ -1268,6 +1317,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                       </div>
                       <div className="hero-index">01 / CONTROL</div>
                     </section>
+                    <CommunityPreview games={data.games} />
                     <div className="metrics">
                       {metric(
                         "Total stations",
@@ -1307,7 +1357,9 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                           <em>TND</em>
                         </>,
                         <CreditCard size={17} />,
-                        "Completed session payments",
+                        sessions.some((s) => s.is_demo)
+                          ? "Includes labeled demo session payments"
+                          : "Completed session payments",
                         "cyan",
                       )}
                     </div>
@@ -1883,7 +1935,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                           <span className="game-art-index">
                             0{i + 1} / NEX LIBRARY
                           </span>
-                          <Gamepad2 size={100} strokeWidth={0.7} />
+                          <GameArtwork key={g.image_url} game={g} />
                           <span className="game-art-title">{g.name}</span>
                           <Badge tone={g.active ? "green" : ""}>
                             {g.active ? "Active" : "Disabled"}
@@ -1899,6 +1951,14 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                             <Monitor size={14} />
                             {g.node_ids.length} assigned stations
                           </div>
+                          <button
+                            className="game-ranking-link"
+                            onClick={() => navigate("/rankings?game=" + g.id)}
+                          >
+                            <Trophy size={14} />
+                            Player rankings
+                            <ArrowRight size={14} />
+                          </button>
                           <details>
                             <summary>Configuration</summary>
                             <small className="mono break-all">
@@ -1956,6 +2016,17 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                     {!data.games.length && (
                       <Empty>Add your first game to the library.</Empty>
                     )}
+                    <p className="game-library-credits">
+                      Game artwork belongs to Riot Games, Valve, and Psyonix /
+                      Epic Games.{" "}
+                      <a
+                        href="/images/CREDITS.txt"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Artwork credits ↗
+                      </a>
+                    </p>
                   </div>
                 }
               />

@@ -1,0 +1,26 @@
+NexArena game artwork credits
+
+VALORANT — Iso wallpaper, Riot Games.
+Source page: https://playvalorant.com/en-us/media/
+Asset: https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/083baed63d306ee9ba41df4971ac0f6bb0222032-1920x1080.jpg
+
+League of Legends — Yasuo splash illustration, Riot Games.
+Champion: https://www.leagueoflegends.com/en-us/champions/yasuo/
+Asset: https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg
+
+Counter-Strike 2 — Steam library artwork, Valve.
+Asset: https://cdn.akamai.steamstatic.com/steam/apps/730/library_hero.jpg
+
+Rocket League — Steam library artwork, Psyonix / Epic Games.
+Asset: https://cdn.akamai.steamstatic.com/steam/apps/252950/library_hero.jpg
+
+Downloaded 2026-09-30. Artwork and game names belong to their respective owners.
+NexArena is an independent demo application, not endorsed by these publishers.
+Artwork is presented only to identify each game in the catalog; it is not relicensed as NexArena-owned artwork.
+
+Team references:
+GnG Esports: https://www.gngesports.gg/
+JSK Esports: https://www.linkedin.com/company/jsk-esports
+GNG/JSK roster assignments, player profiles and match results in this demo are fictional.
+Carthage Wolves and Sahel Phoenix are fictional community teams.
+Team shields are generic letter badges drawn in the application, not official team logos.

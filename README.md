@@ -14,6 +14,7 @@
 - A centralized game library, node assignments, and remote launch requests validated against a second local executable allowlist.
 - Windows workstation locking and optional delayed shutdown, command acknowledgments, audit history, and timeout states.
 - Responsive dark dashboard, real API data, WebSocket updates/reconnection, loading/empty/error states, and action confirmations.
+- Tunisian teams (GNG/JSK references and two fictional squads), 16 labeled demo player profiles, League of Legends and publisher game artwork, and independent per-game Elo ladders with admin-recorded results. See [Tunisian esports](docs/tunisian-esports.md).
 
 Seed records are explicitly demo business records. **Station status and telemetry are never fabricated.** PC-01–PC-04 remain offline until agents connect.
 

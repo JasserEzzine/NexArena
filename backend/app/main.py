@@ -95,6 +95,8 @@ async def lifespan(app):
 
 
 app = FastAPI(title="NexArena API", version="1.0.0", lifespan=lifespan)
+from .esports import router as esports_router
+app.include_router(esports_router)
 app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins.split(","), allow_methods=["GET", "POST", "PUT", "DELETE"], allow_headers=["Authorization", "Content-Type", "X-Agent-Key", "X-Node-Id"])
 
 
@@ -571,7 +573,7 @@ async def dashboard_ws(ws: WebSocket):
         hub.dashboards.discard(ws)
         try:
             await ws.close()
-        except RuntimeError:
+        except (RuntimeError, WebSocketDisconnect):
             pass
 
 
@@ -619,5 +621,5 @@ async def agent_ws(ws: WebSocket, id: str):
             await hub.publish("node_offline")
         try:
             await ws.close()
-        except RuntimeError:
+        except (RuntimeError, WebSocketDisconnect):
             pass

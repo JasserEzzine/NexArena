@@ -94,7 +94,30 @@ class GameInput(Input):
     version: str = Field(default="", max_length=50)
     executable_path: str = Field(min_length=1, max_length=500)
     active: bool = True
+    image_url: str = Field(default="", max_length=500, pattern=r"^(https://[^\s]+|/images/[^\s]+)?$")
 
 
 class LaunchInput(Input):
     game_id: str
+
+
+class TeamInput(Input):
+    name: str = Field(min_length=2, max_length=120)
+    tag: str = Field(pattern=r"^[A-Z0-9]{2,12}$")
+    city: str = Field(min_length=2, max_length=80)
+    description: str = Field(default="", max_length=1000)
+    color: str = Field(default="#34d5c4", pattern=r"^#[0-9a-fA-F]{6}$")
+    website: str = Field(default="", max_length=300, pattern=r"^(https://[^\s]+)?$")
+
+
+class PlayerProfileInput(Input):
+    handle: str = Field(min_length=2, max_length=40, pattern=r"^[\w.-]+$")
+    city: str = Field(min_length=2, max_length=80)
+    team_id: str | None = None
+
+
+class RankedResultInput(Input):
+    game_id: str
+    winner_id: str
+    loser_id: str
+    reference: str = Field(min_length=8, max_length=100)

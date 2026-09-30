@@ -1,5 +1,13 @@
 # Phase 1 verification
 
+## Tunisian esports update — 2026-09-30
+
+Migration `002` adds artwork fields, teams, player profiles, per-game ratings and the result ledger. The additive Tunisian showcase has been loaded locally, with 16 fictional players and 512 sample results. The PostgreSQL suite now contains **14 passing tests**, including Elo calculation, game isolation, concurrent/idempotent result recording, authorization, team assignment, and repeat-safe seeding with balanced wallet ledgers. The production frontend build passes. See [Tunisian esports](tunisian-esports.md) for rules and data provenance.
+
+All **3 Playwright tests pass**, covering publisher image loading, the GNG/JSK directory, roster filters, per-game ladders, invalid self-match rejection, successful result entry, mobile overflow, and the existing staff/admin dashboard flows. Screenshots of Games, Teams, and Rankings are included. A local PostgreSQL process interruption was recovered before the final successful browser run; the seeded data remained intact.
+
+The earlier Phase 1 verification below remains the baseline for station operations and the Windows agent.
+
 Verified locally on Windows with PostgreSQL 17.6, Python 3.14.4, Node 22.12.0, and .NET SDK 8.0.418. Final real-agent launch verification: 2026-09-30.
 
 ## Executed checks

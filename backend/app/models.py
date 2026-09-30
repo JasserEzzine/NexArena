@@ -72,6 +72,7 @@ class GamingSession(Base):
     rate: Mapped[Decimal] = mapped_column(Numeric(12, 3))
     cost: Mapped[Decimal] = mapped_column(Numeric(12, 3), default=0)
     status: Mapped[str] = mapped_column(String(20), default="ACTIVE")
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
     __table_args__ = (Index("one_active_session_per_node", "node_id", unique=True, postgresql_where=text("status = 'ACTIVE'")), Index("one_active_session_per_user", "user_id", unique=True, postgresql_where=text("status = 'ACTIVE'")), CheckConstraint("rate > 0"))
 
 
@@ -115,6 +116,7 @@ class Reservation(Base):
     start_time: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     end_time: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     status: Mapped[str] = mapped_column(String(20), default="CONFIRMED")
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
     __table_args__ = (CheckConstraint("end_time > start_time"),)
 
 
@@ -127,6 +129,7 @@ class Game(Base):
     version: Mapped[str] = mapped_column(String(50), default="")
     executable_path: Mapped[str] = mapped_column(String(500))
     active: Mapped[bool] = mapped_column(Boolean, default=True)
+    image_url: Mapped[str] = mapped_column(String(500), default="")
 
 
 class NodeGame(Base):
@@ -156,3 +159,53 @@ class Command(Base):
     status: Mapped[str] = mapped_column(String(20), default="PENDING")
     result: Mapped[str] = mapped_column(String(1000), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class EsportsTeam(Base):
+    __tablename__ = "esports_teams"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    name: Mapped[str] = mapped_column(String(120), unique=True)
+    tag: Mapped[str] = mapped_column(String(12), unique=True)
+    city: Mapped[str] = mapped_column(String(80))
+    description: Mapped[str] = mapped_column(String(1000), default="")
+    color: Mapped[str] = mapped_column(String(7), default="#34d5c4")
+    website: Mapped[str] = mapped_column(String(300), default="")
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class PlayerProfile(Base):
+    __tablename__ = "player_profiles"
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    handle: Mapped[str] = mapped_column(String(40), unique=True)
+    city: Mapped[str] = mapped_column(String(80))
+    team_id: Mapped[str | None] = mapped_column(ForeignKey("esports_teams.id"), nullable=True, index=True)
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class PlayerRanking(Base):
+    __tablename__ = "player_rankings"
+    user_id: Mapped[str] = mapped_column(ForeignKey("player_profiles.user_id"), primary_key=True)
+    game_id: Mapped[str] = mapped_column(ForeignKey("games.id"), primary_key=True)
+    rating: Mapped[int] = mapped_column(Integer, default=1000)
+    wins: Mapped[int] = mapped_column(Integer, default=0)
+    losses: Mapped[int] = mapped_column(Integer, default=0)
+    streak: Mapped[int] = mapped_column(Integer, default=0)
+    peak_rating: Mapped[int] = mapped_column(Integer, default=1000)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    __table_args__ = (CheckConstraint("rating >= 0 AND wins >= 0 AND losses >= 0", name="nonnegative_ranking"),)
+
+
+class RankedResult(Base):
+    __tablename__ = "ranked_results"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    reference: Mapped[str] = mapped_column(String(100), unique=True)
+    game_id: Mapped[str] = mapped_column(ForeignKey("games.id"), index=True)
+    winner_id: Mapped[str] = mapped_column(ForeignKey("player_profiles.user_id"))
+    loser_id: Mapped[str] = mapped_column(ForeignKey("player_profiles.user_id"))
+    actor_id: Mapped[str] = mapped_column(ForeignKey("users.id"))
+    rating_delta: Mapped[int] = mapped_column(Integer)
+    winner_rating: Mapped[int] = mapped_column(Integer)
+    loser_rating: Mapped[int] = mapped_column(Integer)
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    __table_args__ = (CheckConstraint("winner_id <> loser_id", name="distinct_ranked_players"),)
