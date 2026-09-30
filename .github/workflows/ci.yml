@@ -1,0 +1,67 @@
+name: NexArena checks
+on: [push, pull_request]
+jobs:
+  web-api:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: nexarena
+          POSTGRES_PASSWORD: ci-only-postgres-password
+          POSTGRES_DB: nexarena
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U nexarena -d nexarena"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: pip install -r backend/requirements.lock.txt
+      - name: Generate isolated CI environment
+        run: |
+          python scripts/init-env.py
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('.env')
+          lines = [line for line in p.read_text().splitlines() if not line.startswith(('DATABASE_URL=', 'POSTGRES_PASSWORD='))]
+          lines += ['POSTGRES_PASSWORD=ci-only-postgres-password', 'DATABASE_URL=postgresql+psycopg://nexarena:ci-only-postgres-password@127.0.0.1:5432/nexarena']
+          p.write_text('\n'.join(lines) + '\n')
+          PY
+      - name: Migrate, seed, and test API
+        working-directory: backend
+        run: |
+          alembic upgrade head
+          python -m app.seed
+          python -m pytest -q
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run typecheck
+          npm run format:check
+          npm run build
+          npx playwright install --with-deps chromium
+      - name: Browser tests
+        run: |
+          (cd backend && uvicorn app.main:app --host 127.0.0.1 --port 8000 > ../backend.log 2>&1) &
+          (cd frontend && npm run dev > ../frontend.log 2>&1) &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8000/api/health && curl -fsS http://127.0.0.1:5173/ && break; sleep 1; done
+          cd frontend && npm run test:e2e
+      - run: docker compose config --quiet
+  windows-agent:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet build agent/NexArena.Agent.csproj -c Release
+      - run: dotnet run --project agent-tests -c Release

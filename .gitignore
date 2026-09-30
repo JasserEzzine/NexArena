@@ -1,0 +1,14 @@
+.env
+.venv/
+.tools/
+__pycache__/
+.pytest_cache/
+node_modules/
+dist/
+bin/
+obj/
+*.log
+agent/appsettings.local.json
+playwright-report/
+test-results/
+*.tsbuildinfo
