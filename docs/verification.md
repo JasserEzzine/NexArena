@@ -16,7 +16,10 @@ Verified locally on Windows with PostgreSQL 17.6, Python 3.14.4, Node 22.12.0, a
 | C# release build | Passed, 0 warnings / 0 errors |
 | C# command safety suite | **9 passed** |
 | Docker Compose configuration validation | Passed |
-| Docker runtime / container image builds | Not verified: installed Docker Desktop engine did not start |
+| Docker runtime / container image builds | **Passed on GitHub's Linux runner**: image builds, Compose startup, nginx-to-API health check, seed, and container login |
+| GitHub Actions Linux and Windows jobs | **Passed** for implementation commit `b279a9b` |
+
+Successful full CI run: [NexArena checks #36673124169](https://github.com/JasserEzzine/NexArena/actions/runs/36673124169). The local Windows Docker Desktop engine still did not start; container deployment was instead verified on the GitHub runner.
 
 The Python test runner emits one upstream Starlette warning about future replacement of its `httpx` TestClient transport. It does not affect the passing tests.
 
@@ -38,11 +41,11 @@ A shutdown request delivered to the real agent was correctly rejected because `E
 
 ## Remaining acceptance boundaries
 
-- Docker image execution needs a functioning Docker Linux engine. Compose syntax/configuration was validated only.
+- Local Docker Desktop still needs a functioning Linux engine to run Compose on this Windows machine. The same Compose stack successfully built and ran in GitHub CI.
 - Physical Windows lock, enabled shutdown, and real installed-game behavior still need acceptance on a dedicated gaming station. The native implementations build and command routing is tested.
 - Peripheral removal alerts were verified with protocol fixtures; physically unplugging devices and virtual-device edge cases need testing on the target PCs.
 - Sensor availability varies with hardware, drivers, and permissions.
-- CI configuration is included but has not run on GitHub until the repository is pushed and Actions executes it.
+- Both Linux web/API/container checks and Windows agent checks passed on GitHub Actions.
 - The source was pushed to the public [JasserEzzine/NexArena](https://github.com/JasserEzzine/NexArena) repository on 2026-09-30. A demo video script is included; no video was recorded.
 
 These boundaries are intentionally separate from implemented features; they should not be described as completed physical or deployment acceptance tests.

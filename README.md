@@ -30,6 +30,8 @@ Seed records are explicitly demo business records. **Station status and telemetr
 
 See [architecture](docs/architecture.md), [API guide](docs/api.md), [demo script](docs/demo.md), and [verification results](docs/verification.md).
 
+Published repository: [JasserEzzine/NexArena](https://github.com/JasserEzzine/NexArena). The implementation passed [GitHub CI](https://github.com/JasserEzzine/NexArena/actions/runs/36673124169), including the full Docker Compose deployment smoke test.
+
 ## Prerequisites
 
 - Docker Desktop with its Linux engine running for Compose; alternatively PostgreSQL 17 installed locally.
